@@ -1,6 +1,8 @@
 import { VSCodeDropdown, VSCodeOption } from "@vscode/webview-ui-toolkit/react"
-import React from "react"
+import React, { useEffect } from "react"
 import { ChatSettings } from "@shared/ChatSettings"
+import { useTranslation } from "@/i18n/translate"
+import { LanguageKey, languageOptions } from "@shared/Languages"
 
 interface PreferredLanguageSettingProps {
 	chatSettings: ChatSettings
@@ -8,6 +10,14 @@ interface PreferredLanguageSettingProps {
 }
 
 const PreferredLanguageSetting: React.FC<PreferredLanguageSettingProps> = ({ chatSettings, setChatSettings }) => {
+	const { t, setLanguage } = useTranslation()
+	useEffect(() => {
+		let langkey: LanguageKey = "en"
+		let key = languageOptions.find((it) => it.display == chatSettings.preferredLanguage)
+		if (key) langkey = key.key
+		setLanguage(langkey)
+	}, [chatSettings.preferredLanguage, setLanguage])
+
 	return (
 		<div style={{}}>
 			<label htmlFor="preferred-language-dropdown" className="block mb-1 text-sm font-medium">

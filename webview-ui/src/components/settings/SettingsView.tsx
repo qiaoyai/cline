@@ -23,6 +23,8 @@ import SectionHeader from "./SectionHeader"
 import TerminalSettingsSection from "./TerminalSettingsSection"
 import { convertApiConfigurationToProtoApiConfiguration } from "@shared/proto-conversions/state/settings-conversion"
 import { convertChatSettingsToProtoChatSettings } from "@shared/proto-conversions/state/chat-settings-conversion"
+import { t } from "@/i18n/translate"
+
 const IS_DEV = process.env.IS_DEV
 
 // Styles for the tab system
@@ -495,10 +497,10 @@ const SettingsView = ({ onDone, targetSection }: SettingsViewProps) => {
 				</div>
 				<div className="flex gap-2">
 					<VSCodeButton appearance="secondary" onClick={handleCancel}>
-						Cancel
+						{t("common.cancel")}
 					</VSCodeButton>
 					<VSCodeButton onClick={() => handleSubmit(false)} disabled={!hasUnsavedChanges}>
-						Save
+						{t("common.save")}
 					</VSCodeButton>
 				</div>
 			</TabHeader>
