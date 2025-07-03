@@ -2,9 +2,9 @@ import { VSCodeButton, VSCodeLink } from "@vscode/webview-ui-toolkit/react"
 import { memo, useState } from "react"
 import styled from "styled-components"
 import { useExtensionState } from "@/context/ExtensionStateContext"
-import { vscode } from "@/utils/vscode"
-import { TelemetrySetting } from "@shared/TelemetrySetting"
-import { t } from "../../i18n/translate"
+import { StateServiceClient } from "@/services/grpc-client"
+import { TelemetrySettingEnum, TelemetrySettingRequest } from "@shared/proto/state"
+import { useTranslation } from "@/i18n/translate"
 
 const BannerContainer = styled.div`
 	background-color: var(--vscode-banner-background);
@@ -47,6 +47,7 @@ const ButtonContainer = styled.div`
 `
 
 const TelemetryBanner = () => {
+	const { t } = useTranslation()
 	const { navigateToSettings } = useExtensionState()
 
 	const handleOpenSettings = () => {
@@ -54,8 +55,16 @@ const TelemetryBanner = () => {
 		navigateToSettings()
 	}
 
-	const handleClose = () => {
-		vscode.postMessage({ type: "telemetrySetting", telemetrySetting: "enabled" satisfies TelemetrySetting })
+	const handleClose = async () => {
+		try {
+			await StateServiceClient.updateTelemetrySetting(
+				TelemetrySettingRequest.create({
+					setting: TelemetrySettingEnum.ENABLED,
+				}),
+			)
+		} catch (error) {
+			console.error("Error updating telemetry setting:", error)
+		}
 	}
 
 	return (

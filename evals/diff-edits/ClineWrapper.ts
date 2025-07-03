@@ -8,11 +8,13 @@ import {
 	parseAssistantMessageV3,
 	AssistantMessageContent,
 } from "./parsing/parse-assistant-message-06-06-25" // "../../src/core/assistant-message"
-import { constructNewFileContent as constructNewFileContentV1, constructNewFileContentV2 } from "./diff-apply/diff-06-06-25"
-import { constructNewFileContent as constructNewFileContentV3 } from "../../src/core/assistant-message/diff" // this defaults to the new v1 when called
+import { constructNewFileContent as constructNewFileContent_06_06_25 } from "./diff-apply/diff-06-06-25"
+import { constructNewFileContent as constructNewFileContent_06_23_25 } from "./diff-apply/diff-06-23-25"
+import { constructNewFileContent as constructNewFileContent_06_25_25 } from "./diff-apply/diff-06-25-25"
+import { constructNewFileContent as constructNewFileContent_06_26_25 } from "./diff-apply/diff-06-26-25"
 
 type ParseAssistantMessageFn = (message: string) => AssistantMessageContent[]
-type ConstructNewFileContentFn = (diff: string, original: string, strict: boolean) => Promise<string>
+type ConstructNewFileContentFn = (diff: string, original: string, strict: boolean) => Promise<string | any>
 
 const parsingFunctions: Record<string, ParseAssistantMessageFn> = {
 	parseAssistantMessageV1: parseAssistantMessageV1,
@@ -21,9 +23,10 @@ const parsingFunctions: Record<string, ParseAssistantMessageFn> = {
 }
 
 const diffEditingFunctions: Record<string, ConstructNewFileContentFn> = {
-	constructNewFileContentV1: constructNewFileContentV1,
-	constructNewFileContentV2: constructNewFileContentV2,
-	constructNewFileContentV3: constructNewFileContentV3, // position invariant diff
+	"diff-06-06-25": constructNewFileContent_06_06_25,
+	"diff-06-23-25": constructNewFileContent_06_23_25,
+	"diff-06-25-25": constructNewFileContent_06_25_25,
+	"diff-06-26-25": constructNewFileContent_06_26_25,
 }
 
 import { TestInput, TestResult, ExtractedToolCall } from "./types"
@@ -151,6 +154,7 @@ export async function runSingleEvaluation(input: TestInput): Promise<TestResult>
 			diffEditFunction,
 			thinkingBudgetTokens,
 			originalDiffEditToolCallMessage,
+			diffApplyFile,
 		} = input
 
 		const requiredParams = {
@@ -176,7 +180,7 @@ export async function runSingleEvaluation(input: TestInput): Promise<TestResult>
 		}
 
 		const parseAssistantMessage = parsingFunctions[parsingFunction]
-		const constructNewFileContent = diffEditingFunctions[diffEditFunction]
+		const constructNewFileContent = diffEditingFunctions[diffApplyFile || diffEditFunction]
 
 		if (!parseAssistantMessage || !constructNewFileContent) {
 			return {
@@ -306,10 +310,18 @@ export async function runSingleEvaluation(input: TestInput): Promise<TestResult>
 
 		// checking if the diff edit succeeds, if it failed it will throw an error
 		let diffSuccess = true
+		let replacementData: any = undefined
 		try {
-			await constructNewFileContent(diffToolContent, originalFile, true)
+			const result = await constructNewFileContent(diffToolContent, originalFile, true)
+			
+			// Check if result is an object with replacements (new format)
+			if (typeof result === 'object' && result !== null && 'replacements' in result) {
+				replacementData = result.replacements
+			}
+			// If it's just a string, diffSuccess stays true and replacementData stays undefined
 		} catch (error: any) {
 			diffSuccess = false
+			console.log("ERROR:",error)
 		}
 
 		return {
@@ -318,6 +330,7 @@ export async function runSingleEvaluation(input: TestInput): Promise<TestResult>
 			toolCalls: detectedToolCalls,
 			diffEdit: diffToolContent,
 			diffEditSuccess: diffSuccess,
+			replacementData: replacementData,
 		}
 	} catch (error: any) {
 		return {
