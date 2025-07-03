@@ -195,6 +195,7 @@ const OpenRouterModelPicker: React.FC<OpenRouterModelPickerProps> = ({ isPopup }
 	}, [selectedIndex])
 
 	const showBudgetSlider = useMemo(() => {
+		setSearchTerm(selectedModelId)
 		return (
 			selectedModelId?.toLowerCase().includes("claude-sonnet-4") ||
 			selectedModelId?.toLowerCase().includes("claude-opus-4") ||

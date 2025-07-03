@@ -5,7 +5,7 @@ import { ExtensionMessage } from "@shared/ExtensionMessage"
 import { PlanActMode, ResetStateRequest, TogglePlanActModeRequest } from "@shared/proto/state"
 import { VSCodeButton } from "@vscode/webview-ui-toolkit/react"
 import { CheckCheck, FlaskConical, Info, LucideIcon, Settings, SquareMousePointer, SquareTerminal, Webhook } from "lucide-react"
-import { useCallback, useEffect, useRef, useState, useTransition } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react"
 import { useEvent } from "react-use"
 import { Tab, TabContent, TabHeader, TabList, TabTrigger } from "../common/Tab"
 import FeatureSettingsSection from "./sections/FeatureSettingsSection"
@@ -38,76 +38,79 @@ interface SettingsTab {
 	icon: LucideIcon
 }
 
-export const SETTINGS_TABS: SettingsTab[] = [
-	{
-		id: "api-config",
-		name: "API Configuration",
-		tooltipText: "API Configuration",
-		headerText: "API Configuration",
-		icon: Webhook,
-	},
-	{
-		id: "general",
-		name: "General",
-		tooltipText: "General Settings",
-		headerText: "General Settings",
-		icon: Settings,
-	},
-	{
-		id: "features",
-		name: "Features",
-		tooltipText: "Feature Settings",
-		headerText: "Feature Settings",
-		icon: CheckCheck,
-	},
-	{
-		id: "browser",
-		name: "Browser",
-		tooltipText: "Browser Settings",
-		headerText: "Browser Settings",
-		icon: SquareMousePointer,
-	},
-	{
-		id: "terminal",
-		name: "Terminal",
-		tooltipText: "Terminal Settings",
-		headerText: "Terminal Settings",
-		icon: SquareTerminal,
-	},
-	// Only show in dev mode
-	...(IS_DEV
-		? [
-				{
-					id: "debug",
-					name: "Debug",
-					tooltipText: "Debug Tools",
-					headerText: "Debug",
-					icon: FlaskConical,
-				},
-			]
-		: []),
-	{
-		id: "about",
-		name: "About",
-		tooltipText: "About Cline",
-		headerText: "About",
-		icon: Info,
-	},
-]
-
 type SettingsViewProps = {
 	onDone: () => void
 	targetSection?: string
 }
 
 const SettingsView = ({ onDone, targetSection }: SettingsViewProps) => {
+	const { t } = useTranslation()
+	const SETTINGS_TABS: SettingsTab[] = useMemo(
+		() => [
+			{
+				id: "api-config",
+				name: t("settings.apiConfiguration"),
+				tooltipText: t("settings.apiConfiguration"),
+				headerText: t("settings.apiConfiguration"),
+				icon: Webhook,
+			},
+			{
+				id: "general",
+				name: t("settings.general"),
+				tooltipText: t("settings.generalSettings"),
+				headerText: t("settings.generalSettings"),
+				icon: Settings,
+			},
+			{
+				id: "features",
+				name: t("settings.feature"),
+				tooltipText: t("settings.featureSettings"),
+				headerText: t("settings.featureSettings"),
+				icon: CheckCheck,
+			},
+			{
+				id: "browser",
+				name: t("settings.browser"),
+				tooltipText: t("settings.browserSettings"),
+				headerText: t("settings.browserSettings"),
+				icon: SquareMousePointer,
+			},
+			{
+				id: "terminal",
+				name: t("settings.terminal"),
+				tooltipText: t("settings.terminalSettings"),
+				headerText: t("settings.terminalSettings"),
+				icon: SquareTerminal,
+			},
+			// Only show in dev mode
+			...(IS_DEV
+				? [
+						{
+							id: "debug",
+							name: t("settings.debug"),
+							tooltipText: t("settings.debugTools"),
+							headerText: t("settings.debug"),
+							icon: FlaskConical,
+						},
+					]
+				: []),
+			{
+				id: "about",
+				name: t("settings.aboutCline"),
+				tooltipText: t("settings.aboutCline"),
+				headerText: t("settings.aboutCline"),
+				icon: Info,
+			},
+		],
+		[t],
+	)
 	// Track active tab
 	const [activeTab, setActiveTab] = useState<string>(targetSection || SETTINGS_TABS[0].id)
 	// Track if we're currently switching modes
 	const [isSwitchingMode, setIsSwitchingMode] = useState(false)
 
 	const { version, chatSettings } = useExtensionState()
-	const { t } = useTranslation()
+
 	const handleMessage = useCallback((event: MessageEvent) => {
 		const message: ExtensionMessage = event.data
 		switch (message.type) {

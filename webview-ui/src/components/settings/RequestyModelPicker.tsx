@@ -151,6 +151,7 @@ const RequestyModelPicker: React.FC<RequestyModelPickerProps> = ({ isPopup }) =>
 	}, [selectedIndex])
 
 	const showBudgetSlider = useMemo(() => {
+		setSearchTerm(selectedModelId)
 		return selectedModelId?.includes("claude-3-7-sonnet")
 	}, [selectedModelId])
 
