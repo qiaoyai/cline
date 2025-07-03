@@ -1,5 +1,6 @@
 import { createContext, useState, useContext, useCallback, useEffect, ReactNode } from "react"
 import { LanguageKey, languageOptions, DEFAULT_LANGUAGE_SETTINGS } from "@shared/Languages"
+import { useExtensionState } from "../context/ExtensionStateContext"
 
 import { resources } from "./locales/index"
 let currentLanguage: LanguageKey = DEFAULT_LANGUAGE_SETTINGS
@@ -36,7 +37,19 @@ interface ITranslationContext {
 const TranslationContext = createContext<ITranslationContext | null>(null)
 
 export function TranslationProvider({ children }: { children: ReactNode }) {
-	const [language, setLanguageState] = useState<LanguageKey>(DEFAULT_LANGUAGE_SETTINGS)
+	const { chatSettings } = useExtensionState()
+	const getLanguageKeyFromSettings = (): LanguageKey => {
+		if (!chatSettings.preferredLanguage) {
+			return DEFAULT_LANGUAGE_SETTINGS
+		}
+		const option = languageOptions.find((opt) => opt.display === chatSettings.preferredLanguage)
+		return option ? option.key : DEFAULT_LANGUAGE_SETTINGS
+	}
+	const [language, setLanguageState] = useState<LanguageKey>(getLanguageKeyFromSettings())
+
+	useEffect(() => {
+		setLanguageState(getLanguageKeyFromSettings())
+	}, [chatSettings.preferredLanguage])
 
 	useEffect(() => {
 		currentLanguage = language

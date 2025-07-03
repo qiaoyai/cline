@@ -6,6 +6,7 @@ import { CheckpointRestoreRequest } from "@shared/proto/checkpoints"
 import React, { forwardRef, useRef, useState } from "react"
 import DynamicTextArea from "react-textarea-autosize"
 import { highlightText } from "./task-header/TaskHeader"
+import { t } from "../../i18n/translate"
 
 interface UserMessageProps {
 	text?: string
@@ -128,19 +129,19 @@ const UserMessage: React.FC<UserMessageProps> = ({ text, images, files, messageT
 							<RestoreButton
 								ref={restoreAllButtonRef}
 								type="taskAndWorkspace"
-								label="Restore All"
+								label={t("components.restoreAll")}
 								isPrimary={false}
 								onClick={handleRestoreWorkspace}
-								title="Restore both the chat and workspace files to this checkpoint and send your edited message"
+								title={t("components.restoreAllDesc")}
 							/>
 						)}
 						<RestoreButton
 							ref={restoreChatButtonRef}
 							type="task"
-							label="Restore Chat"
+							label={t("components.restoreChat")}
 							isPrimary={true}
 							onClick={handleRestoreWorkspace}
-							title="Restore just the chat to this checkpoint and send your edited message"
+							title={t("components.restoreChatDesc")}
 						/>
 					</div>
 				</>

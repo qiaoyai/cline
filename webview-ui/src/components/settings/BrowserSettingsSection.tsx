@@ -7,6 +7,7 @@ import styled from "styled-components"
 import { BROWSER_VIEWPORT_PRESETS } from "../../../../src/shared/BrowserSettings"
 import { useExtensionState } from "../../context/ExtensionStateContext"
 import { BrowserServiceClient } from "../../services/grpc-client"
+import { t } from "@/i18n/translate"
 
 const ConnectionStatusIndicator = ({
 	isChecking,
@@ -24,15 +25,15 @@ const ConnectionStatusIndicator = ({
 			{isChecking ? (
 				<>
 					<Spinner />
-					<StatusText>Checking connection...</StatusText>
+					<StatusText>{t("settings.checkingConnection")}</StatusText>
 				</>
 			) : isConnected === true ? (
 				<>
 					<CheckIcon className="codicon codicon-check" />
-					<StatusText style={{ color: "var(--vscode-terminal-ansiGreen)" }}>Connected</StatusText>
+					<StatusText style={{ color: "var(--vscode-terminal-ansiGreen)" }}>{t("common.connected")}</StatusText>
 				</>
 			) : isConnected === false ? (
-				<StatusText style={{ color: "var(--vscode-errorForeground)" }}>Not connected</StatusText>
+				<StatusText style={{ color: "var(--vscode-errorForeground)" }}>{t("settings.notConnected")}</StatusText>
 			) : null}
 		</StatusContainer>
 	)
@@ -372,7 +373,7 @@ export const BrowserSettingsSection: React.FC = () => {
 				<VSCodeCheckbox
 					checked={browserSettings.disableToolUse || false}
 					onChange={(e) => updateDisableToolUse((e.target as HTMLInputElement).checked)}>
-					Disable browser tool usage
+					{t("settings.disableBrowserToolUsage")}
 				</VSCodeCheckbox>
 				<p
 					style={{
@@ -380,14 +381,16 @@ export const BrowserSettingsSection: React.FC = () => {
 						color: "var(--vscode-descriptionForeground)",
 						margin: "4px 0 0 0px",
 					}}>
-					Prevent Cline from using browser actions (e.g. launch, click, type).
+					{t("settings.disableBrowserToolDescription")}
 				</p>
 			</div>
 
 			<CollapsibleContent isOpen={isSubSettingsOpen}>
 				<div style={{ marginBottom: 15 }}>
 					<div style={{ marginBottom: 8 }}>
-						<label style={{ fontWeight: "500", display: "block", marginBottom: 5 }}>Viewport size</label>
+						<label style={{ fontWeight: "500", display: "block", marginBottom: 5 }}>
+							{t("settings.viewportSize")}
+						</label>
 						<VSCodeDropdown
 							style={{ width: "100%" }}
 							value={
@@ -413,7 +416,7 @@ export const BrowserSettingsSection: React.FC = () => {
 							color: "var(--vscode-descriptionForeground)",
 							margin: 0,
 						}}>
-						Set the size of the browser viewport for screenshots and interactions.
+						{t("settings.viewportSizeDescription")}
 					</p>
 				</div>
 
@@ -424,7 +427,7 @@ export const BrowserSettingsSection: React.FC = () => {
 						<VSCodeCheckbox
 							checked={browserSettings.remoteBrowserEnabled}
 							onChange={(e) => updateRemoteBrowserEnabled((e.target as HTMLInputElement).checked)}>
-							Use remote browser connection
+							{t("settings.useRemoteBrowserConnection")}
 						</VSCodeCheckbox>
 						<ConnectionStatusIndicator
 							isChecking={isCheckingConnection}
@@ -464,7 +467,7 @@ export const BrowserSettingsSection: React.FC = () => {
 							{shouldShowRelaunchButton && (
 								<div style={{ display: "flex", gap: "10px", marginBottom: 8, justifyContent: "center" }}>
 									<VSCodeButton style={{ flex: 1 }} disabled={debugMode} onClick={relaunchChromeDebugMode}>
-										{debugMode ? "Launching Browser..." : "Launch Browser with Debug Mode"}
+										{debugMode ? t("settings.launchingBrowser") : t("settings.launchBrowserDebugMode")}
 									</VSCodeButton>
 								</div>
 							)}
@@ -498,7 +501,7 @@ export const BrowserSettingsSection: React.FC = () => {
 					{/* Chrome Executable Path section now follows remote-specific settings */}
 					<div style={{ marginBottom: 8, marginTop: 8 }}>
 						<label htmlFor="chrome-executable-path" style={{ fontWeight: "500", display: "block", marginBottom: 5 }}>
-							Chrome Executable Path (Optional)
+							{t("settings.chromeExecutablePath")}
 						</label>
 						<VSCodeTextField
 							id="chrome-executable-path"
@@ -517,7 +520,7 @@ export const BrowserSettingsSection: React.FC = () => {
 								color: "var(--vscode-descriptionForeground)",
 								margin: "4px 0 0 0",
 							}}>
-							Leave blank to auto-detect.
+							{t("settings.chromePathDescription")}
 						</p>
 					</div>
 				</div>

@@ -1,6 +1,7 @@
 import React, { useState, useRef, forwardRef } from "react"
 import { VSCodeButton } from "@vscode/webview-ui-toolkit/react"
 import styled from "styled-components"
+import { t } from "../../i18n/translate"
 
 // ======== Interfaces ========
 
@@ -89,7 +90,7 @@ export const CopyButton: React.FC<CopyButtonProps> = ({ textToCopy, onCopy, clas
 			appearance="icon"
 			onClick={handleCopy}
 			className={className}
-			aria-label={copied ? "Copied" : ariaLabel || "Copy"}>
+			aria-label={copied ? t("common.copied") : ariaLabel || t("components.copyCode")}>
 			<span className={`codicon codicon-${copied ? "check" : "copy"}`}></span>
 		</StyledButton>
 	)

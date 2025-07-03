@@ -5,7 +5,8 @@ import { CODE_BLOCK_BG_COLOR } from "@/components/common/CodeBlock"
 import { getAsVar, VSC_TITLEBAR_INACTIVE_FOREGROUND } from "@/utils/vscStyles"
 import AutoApproveMenuItem from "./AutoApproveMenuItem"
 import AutoApproveModal from "./AutoApproveModal"
-import { ACTION_METADATA, NOTIFICATIONS_SETTING } from "./constants"
+import { useTranslatedActionMetadata } from "./constants"
+import { t } from "@/i18n/translate"
 
 interface AutoApproveBarProps {
 	style?: React.CSSProperties
@@ -19,7 +20,7 @@ const AutoApproveBar = ({ style }: AutoApproveBarProps) => {
 	const buttonRef = useRef<HTMLDivElement>(null)
 
 	const favorites = useMemo(() => autoApprovalSettings.favorites || [], [autoApprovalSettings.favorites])
-
+	const { ACTION_METADATA, NOTIFICATIONS_SETTING } = useTranslatedActionMetadata()
 	// Render a favorited item with a checkbox
 	const renderFavoritedItem = (favId: string) => {
 		const actions = [...ACTION_METADATA.flatMap((a) => [a, a.subAction]), NOTIFICATIONS_SETTING]
@@ -91,7 +92,7 @@ const AutoApproveBar = ({ style }: AutoApproveBarProps) => {
 						scrollbarWidth: "none",
 						WebkitOverflowScrolling: "touch",
 					}}>
-					<span>Auto-approve:</span>
+					<span>{t("autoApprove.autoApproveLabel")}:</span>
 					{getQuickAccessItems()}
 				</div>
 				{isModalVisible ? (

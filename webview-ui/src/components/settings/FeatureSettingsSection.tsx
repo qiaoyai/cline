@@ -2,6 +2,7 @@ import { VSCodeCheckbox, VSCodeDropdown, VSCodeOption } from "@vscode/webview-ui
 import { useExtensionState } from "@/context/ExtensionStateContext"
 import { memo } from "react"
 import { OpenAIReasoningEffort } from "@shared/ChatSettings"
+import { t } from "@/i18n/translate"
 
 const FeatureSettingsSection = () => {
 	const {
@@ -26,12 +27,9 @@ const FeatureSettingsSection = () => {
 						const checked = e.target.checked === true
 						setEnableCheckpointsSetting(checked)
 					}}>
-					Enable Checkpoints
+					{t("settings.enableCheckpoints")}
 				</VSCodeCheckbox>
-				<p className="text-xs text-[var(--vscode-descriptionForeground)]">
-					Enables extension to save checkpoints of workspace throughout the task. Uses git under the hood which may not
-					work well with large workspaces.
-				</p>
+				<p className="text-xs text-[var(--vscode-descriptionForeground)]">{t("settings.checkpointsDescription")}</p>
 			</div>
 			<div style={{ marginTop: 10 }}>
 				<VSCodeCheckbox
@@ -40,11 +38,9 @@ const FeatureSettingsSection = () => {
 						const checked = e.target.checked === true
 						setMcpMarketplaceEnabled(checked)
 					}}>
-					Enable MCP Marketplace
+					{t("settings.enableMcpMarketplace")}
 				</VSCodeCheckbox>
-				<p className="text-xs text-[var(--vscode-descriptionForeground)]">
-					Enables the MCP Marketplace tab for discovering and installing MCP servers.
-				</p>
+				<p className="text-xs text-[var(--vscode-descriptionForeground)]">{t("settings.mcpMarketplaceDescription")}</p>
 			</div>
 			<div style={{ marginTop: 10 }}>
 				<VSCodeCheckbox
@@ -53,11 +49,9 @@ const FeatureSettingsSection = () => {
 						const checked = e.target.checked === true
 						setMcpRichDisplayEnabled(checked)
 					}}>
-					Enable Rich MCP Display
+					{t("settings.enableRichMcpDisplay")}
 				</VSCodeCheckbox>
-				<p className="text-xs text-[var(--vscode-descriptionForeground)]">
-					Enables rich formatting for MCP responses. When disabled, responses will be shown in plain text.
-				</p>
+				<p className="text-xs text-[var(--vscode-descriptionForeground)]">{t("settings.richMcpDisplayDescription")}</p>
 			</div>
 			<div style={{ marginTop: 10 }}>
 				<VSCodeCheckbox
@@ -66,17 +60,15 @@ const FeatureSettingsSection = () => {
 						const checked = e.target.checked === true
 						setMcpResponsesCollapsed(checked)
 					}}>
-					Collapse MCP Responses
+					{t("settings.collapseMcpResponses")}
 				</VSCodeCheckbox>
-				<p className="text-xs text-[var(--vscode-descriptionForeground)]">
-					Sets the default display mode for MCP response panels
-				</p>
+				<p className="text-xs text-[var(--vscode-descriptionForeground)]">{t("settings.mcpResponsesDescription")}</p>
 			</div>
 			<div style={{ marginTop: 10 }}>
 				<label
 					htmlFor="openai-reasoning-effort-dropdown"
 					className="block text-sm font-medium text-[var(--vscode-foreground)] mb-1">
-					OpenAI Reasoning Effort
+					{t("settings.openAIReasoningEffort")}
 				</label>
 				<VSCodeDropdown
 					id="openai-reasoning-effort-dropdown"
@@ -89,12 +81,12 @@ const FeatureSettingsSection = () => {
 						})
 					}}
 					className="w-full">
-					<VSCodeOption value="low">Low</VSCodeOption>
-					<VSCodeOption value="medium">Medium</VSCodeOption>
-					<VSCodeOption value="high">High</VSCodeOption>
+					<VSCodeOption value="low">{t("low")}</VSCodeOption>
+					<VSCodeOption value="medium">{t("medium")}</VSCodeOption>
+					<VSCodeOption value="high">{t("high")}</VSCodeOption>
 				</VSCodeDropdown>
 				<p className="text-xs mt-[5px] text-[var(--vscode-descriptionForeground)]">
-					Reasoning effort for the OpenAI family of models(applies to all OpenAI model providers)
+					{t("settings.openAIReasoningEffortDescription")}
 				</p>
 			</div>
 		</div>

@@ -10,7 +10,7 @@ import { EmptyRequest, StringRequest } from "@shared/proto/common"
 import { PlanActMode, ResetStateRequest, TogglePlanActModeRequest, UpdateSettingsRequest } from "@shared/proto/state"
 import { VSCodeButton, VSCodeCheckbox, VSCodeLink, VSCodeTextArea } from "@vscode/webview-ui-toolkit/react"
 import { CheckCheck, FlaskConical, Info, LucideIcon, Settings, SquareMousePointer, SquareTerminal, Webhook } from "lucide-react"
-import { memo, useCallback, useEffect, useRef, useState } from "react"
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useEvent } from "react-use"
 import { Tab, TabContent, TabHeader, TabList, TabTrigger } from "../common/Tab"
 import { TabButton } from "../mcp/configuration/McpConfigurationView"
@@ -45,69 +45,70 @@ interface SettingsTab {
 	icon: LucideIcon
 }
 
-export const SETTINGS_TABS: SettingsTab[] = [
-	{
-		id: "api-config",
-		name: "API Configuration",
-		tooltipText: "API Configuration",
-		headerText: "API Configuration",
-		icon: Webhook,
-	},
-	{
-		id: "general",
-		name: "General",
-		tooltipText: "General Settings",
-		headerText: "General Settings",
-		icon: Settings,
-	},
-	{
-		id: "features",
-		name: "Features",
-		tooltipText: "Feature Settings",
-		headerText: "Feature Settings",
-		icon: CheckCheck,
-	},
-	{
-		id: "browser",
-		name: "Browser",
-		tooltipText: "Browser Settings",
-		headerText: "Browser Settings",
-		icon: SquareMousePointer,
-	},
-	{
-		id: "terminal",
-		name: "Terminal",
-		tooltipText: "Terminal Settings",
-		headerText: "Terminal Settings",
-		icon: SquareTerminal,
-	},
-	// Only show in dev mode
-	...(IS_DEV
-		? [
-				{
-					id: "debug",
-					name: "Debug",
-					tooltipText: "Debug Tools",
-					headerText: "Debug",
-					icon: FlaskConical,
-				},
-			]
-		: []),
-	{
-		id: "about",
-		name: "About",
-		tooltipText: "About Cline",
-		headerText: "About",
-		icon: Info,
-	},
-]
-
 type SettingsViewProps = {
 	onDone: () => void
 	targetSection?: string
 }
 
 const SettingsView = ({ onDone, targetSection }: SettingsViewProps) => {
+	const SETTINGS_TABS: SettingsTab[] = useMemo(() => {
+		return [
+			{
+				id: "api-config",
+				name: t("settings.title"),
+				tooltipText: t("settings.title"),
+				headerText: t("settings.title"),
+				icon: Webhook,
+			},
+			{
+				id: "general",
+				name: t("settings.general"),
+				tooltipText: t("settings.generalSettings"),
+				headerText: t("settings.generalSettings"),
+				icon: Settings,
+			},
+			{
+				id: "features",
+				name: t("settings.feature"),
+				tooltipText: t("settings.featureSettings"),
+				headerText: t("settings.featureSettings"),
+				icon: CheckCheck,
+			},
+			{
+				id: "browser",
+				name: t("settings.browser"),
+				tooltipText: t("settings.browserSettings"),
+				headerText: t("settings.browserSettings"),
+				icon: SquareMousePointer,
+			},
+			{
+				id: "terminal",
+				name: t("settings.terminal"),
+				tooltipText: t("settings.terminalSettings"),
+				headerText: t("settings.terminalSettings"),
+				icon: SquareTerminal,
+			},
+			// Only show in dev mode
+			...(IS_DEV
+				? [
+						{
+							id: "debug",
+							name: t("settings.debugTools"),
+							tooltipText: t("settings.debugTools"),
+							headerText: t("settings.debugTools"),
+							icon: FlaskConical,
+						},
+					]
+				: []),
+			{
+				id: "about",
+				name: t("settings.aboutCline"),
+				tooltipText: t("settings.aboutCline"),
+				headerText: t("settings.aboutCline"),
+				icon: Info,
+			},
+		]
+	}, [t])
 	// Track if there are unsaved changes
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 	// State for the unsaved changes dialog
@@ -493,7 +494,7 @@ const SettingsView = ({ onDone, targetSection }: SettingsViewProps) => {
 		<Tab>
 			<TabHeader className="flex justify-between items-center gap-2">
 				<div className="flex items-center gap-1">
-					<h3 className="text-[var(--vscode-foreground)] m-0">Settings</h3>
+					<h3 className="text-[var(--vscode-foreground)] m-0">{t("settings.title")}</h3>
 				</div>
 				<div className="flex gap-2">
 					<VSCodeButton appearance="secondary" onClick={handleCancel}>
@@ -590,12 +591,12 @@ const SettingsView = ({ onDone, targetSection }: SettingsViewProps) => {
 													<TabButton
 														isActive={chatSettings.mode === "plan"}
 														onClick={() => handlePlanActModeChange("plan")}>
-														Plan Mode
+														{t("settings.planMode")}
 													</TabButton>
 													<TabButton
 														isActive={chatSettings.mode === "act"}
 														onClick={() => handlePlanActModeChange("act")}>
-														Act Mode
+														{t("settings.actMode")}
 													</TabButton>
 												</div>
 
@@ -626,12 +627,10 @@ const SettingsView = ({ onDone, targetSection }: SettingsViewProps) => {
 													const checked = e.target.checked === true
 													setPlanActSeparateModelsSetting(checked)
 												}}>
-												Use different models for Plan and Act modes
+												{t("settings.useDifferentModels")}
 											</VSCodeCheckbox>
 											<p className="text-xs mt-[5px] text-[var(--vscode-descriptionForeground)]">
-												Switching between Plan and Act mode will persist the API and model used in the
-												previous mode. This may be helpful e.g. when using a strong reasoning model to
-												architect a plan for a cheaper coding model to act on.
+												{t("settings.useDifferentModelsDescription")}
 											</p>
 										</div>
 									</Section>
@@ -658,21 +657,20 @@ const SettingsView = ({ onDone, targetSection }: SettingsViewProps) => {
 													const checked = e.target.checked === true
 													setTelemetrySetting(checked ? "enabled" : "disabled")
 												}}>
-												Allow anonymous error and usage reporting
+												{t("settings.allowAnonymousReporting")}
 											</VSCodeCheckbox>
 											<p className="text-xs mt-[5px] text-[var(--vscode-descriptionForeground)]">
-												Help improve Cline by sending anonymous usage data and error reports. No code,
-												prompts, or personal information are ever sent. See our{" "}
+												{t("settings.telemetryDescription")}{" "}
 												<VSCodeLink
 													href="https://docs.cline.bot/more-info/telemetry"
 													className="text-inherit">
-													telemetry overview
+													{t("settings.telemetryOverview")}
 												</VSCodeLink>{" "}
-												and{" "}
+												{t("common.and")}{" "}
 												<VSCodeLink href="https://cline.bot/privacy" className="text-inherit">
-													privacy policy
+													{t("settings.privacyPolicy")}
 												</VSCodeLink>{" "}
-												for more details.
+												{t("settings.forMoreDetails")}
 											</p>
 										</div>
 									</Section>
@@ -718,16 +716,16 @@ const SettingsView = ({ onDone, targetSection }: SettingsViewProps) => {
 											onClick={() => handleResetState()}
 											className="mt-[5px] w-auto"
 											style={{ backgroundColor: "var(--vscode-errorForeground)", color: "black" }}>
-											Reset Workspace State
+											{t("settings.resetWorkspaceState")}
 										</VSCodeButton>
 										<VSCodeButton
 											onClick={() => handleResetState(true)}
 											className="mt-[5px] w-auto"
 											style={{ backgroundColor: "var(--vscode-errorForeground)", color: "black" }}>
-											Reset Global State
+											{t("settings.resetGlobalState")}
 										</VSCodeButton>
 										<p className="text-xs mt-[5px] text-[var(--vscode-descriptionForeground)]">
-											This will reset all global state and secret storage in the extension.
+											{t("settings.resetStateDescription")}
 										</p>
 									</Section>
 								</div>
@@ -740,7 +738,7 @@ const SettingsView = ({ onDone, targetSection }: SettingsViewProps) => {
 									<Section>
 										<div className="text-center text-[var(--vscode-descriptionForeground)] text-xs leading-[1.2] px-0 py-0 pr-2 pb-[15px] mt-auto">
 											<p className="break-words m-0 p-0">
-												If you have any questions or feedback, feel free to open an issue at{" "}
+												{t("settings.aboutDescription")}{" "}
 												<VSCodeLink href="https://github.com/cline/cline" className="inline">
 													https://github.com/cline/cline
 												</VSCodeLink>

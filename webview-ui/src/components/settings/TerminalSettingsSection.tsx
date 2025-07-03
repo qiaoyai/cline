@@ -4,6 +4,7 @@ import { useExtensionState } from "@/context/ExtensionStateContext"
 import TerminalOutputLineLimitSlider from "./TerminalOutputLineLimitSlider"
 import { StateServiceClient } from "../../services/grpc-client"
 import { Int64, Int64Request } from "@shared/proto/common"
+import { t } from "@/i18n/translate"
 
 export const TerminalSettingsSection: React.FC = () => {
 	const {
@@ -28,7 +29,7 @@ export const TerminalSettingsSection: React.FC = () => {
 
 		const seconds = parseFloat(value)
 		if (isNaN(seconds) || seconds <= 0) {
-			setInputError("Please enter a positive number")
+			setInputError(t("settings.enterPositiveNumber"))
 			return
 		}
 
@@ -79,7 +80,7 @@ export const TerminalSettingsSection: React.FC = () => {
 		<div id="terminal-settings-section" style={{ marginBottom: 20 }}>
 			<div style={{ marginBottom: 15 }}>
 				<label htmlFor="default-terminal-profile" style={{ fontWeight: "500", display: "block", marginBottom: 5 }}>
-					Default Terminal Profile
+					{t("settings.defaultTerminalProfile")}
 				</label>
 				<VSCodeDropdown
 					id="default-terminal-profile"
@@ -93,14 +94,14 @@ export const TerminalSettingsSection: React.FC = () => {
 					))}
 				</VSCodeDropdown>
 				<p style={{ fontSize: "12px", color: "var(--vscode-descriptionForeground)", margin: "5px 0 0 0" }}>
-					Select the default terminal Cline will use. 'Default' uses your VSCode global setting.
+					{t("settings.defaultTerminalProfileDescription")}
 				</p>
 			</div>
 
 			<div style={{ marginBottom: 15 }}>
 				<div style={{ marginBottom: 8 }}>
 					<label style={{ fontWeight: "500", display: "block", marginBottom: 5 }}>
-						Shell integration timeout (seconds)
+						{t("settings.shellIntegrationTimeout")}
 					</label>
 					<div style={{ display: "flex", alignItems: "center" }}>
 						<VSCodeTextField
@@ -116,8 +117,7 @@ export const TerminalSettingsSection: React.FC = () => {
 					)}
 				</div>
 				<p style={{ fontSize: "12px", color: "var(--vscode-descriptionForeground)", margin: 0 }}>
-					Set how long Cline waits for shell integration to activate before executing commands. Increase this value if
-					you experience terminal connection timeouts.
+					{t("settings.shellIntegrationTimeoutDescription")}
 				</p>
 			</div>
 
@@ -126,12 +126,11 @@ export const TerminalSettingsSection: React.FC = () => {
 					<VSCodeCheckbox
 						checked={terminalReuseEnabled ?? true}
 						onChange={(event) => handleTerminalReuseChange(event as Event)}>
-						Enable aggressive terminal reuse
+						{t("settings.enableAggressiveTerminalReuse")}
 					</VSCodeCheckbox>
 				</div>
 				<p style={{ fontSize: "12px", color: "var(--vscode-descriptionForeground)", margin: 0 }}>
-					When enabled, Cline will reuse existing terminal windows that aren't in the current working directory. Disable
-					this if you experience issues with task lockout after a terminal command.
+					{t("settings.terminalReuseDescription")}
 				</p>
 			</div>
 			<TerminalOutputLineLimitSlider />

@@ -37,6 +37,7 @@ import {
 	VSCodeTextField,
 } from "@vscode/webview-ui-toolkit/react"
 import { Fragment, memo, useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { t } from "../../i18n/translate"
 import { useInterval } from "react-use"
 import styled from "styled-components"
 import * as vscodemodels from "vscode"
@@ -255,7 +256,7 @@ const ApiOptions = ({
 		<div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: isPopup ? -10 : 0 }}>
 			<DropdownContainer className="dropdown-container">
 				<label htmlFor="api-provider">
-					<span style={{ fontWeight: 500 }}>API Provider</span>
+					<span style={{ fontWeight: 500 }}>{t("settings.apiProvider")}</span>
 				</label>
 				<VSCodeDropdown
 					id="api-provider"
@@ -1278,7 +1279,7 @@ const ApiOptions = ({
 								fontWeight: 700,
 								textTransform: "uppercase",
 							}}>
-							Model Configuration
+							{t("settings.modelConfiguration")}
 						</span>
 					</div>
 					{modelConfigurationSelected && (

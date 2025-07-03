@@ -4,6 +4,7 @@ import styled from "styled-components"
 import { useExtensionState } from "@/context/ExtensionStateContext"
 import { vscode } from "@/utils/vscode"
 import { TelemetrySetting } from "@shared/TelemetrySetting"
+import { t } from "../../i18n/translate"
 
 const BannerContainer = styled.div`
 	background-color: var(--vscode-banner-background);
@@ -59,11 +60,11 @@ const TelemetryBanner = () => {
 
 	return (
 		<BannerContainer>
-			<CloseButton onClick={handleClose} aria-label="Close banner and enable telemetry">
+			<CloseButton onClick={handleClose} aria-label={t("components.closeBannerEnableTelemetry")}>
 				✕
 			</CloseButton>
 			<div>
-				<strong>Help Improve Cline</strong>
+				<strong>{t("components.helpImproveCline")}</strong>
 				<i>
 					<br />
 					(and access experimental features)
@@ -74,7 +75,7 @@ const TelemetryBanner = () => {
 					<div style={{ marginTop: 4 }}>
 						You can turn this setting off in{" "}
 						<VSCodeLink href="#" onClick={handleOpenSettings}>
-							settings
+							{t("settings.title").toLowerCase()}
 						</VSCodeLink>
 						.
 					</div>
