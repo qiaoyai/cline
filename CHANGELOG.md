@@ -1,5 +1,21 @@
 # Changelog
 
+## [3.18.5]
+
+-   Fix Plan/Act mode persistence across sessions and multi-workspace conflicts
+-   Improve provider switching performance by 18x (from 550ms to 30ms) with batched storage operations
+-   Improve SAP AI Core provider model organization and fix exception handling (Thanks @schardosin!)
+
+## [3.18.4]
+
+-   Add support for Gemini 2.5 Pro and Flash to SAP AI Core Provider
+-   Fix logging in with Cline account not getting past welcome screen
+
+## [3.18.3]
+
+-   Improve Cerebras Qwen model performance by removing thinking tokens from model input (Thanks @kevint-cerebras!)
+-   Improve Claude Code provider with better error handling and performance optimizations (Thanks @BarreiroT!)
+
 ## [3.18.2]
 
 -   Fix issue where terminal output would not be captured if shell integration fails by falling back to capturing the terminal content.
