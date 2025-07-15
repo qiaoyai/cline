@@ -17,7 +17,7 @@ export function convertApiConfigurationToProtoApiConfiguration(config: ApiConfig
 		apiKey: config.apiKey,
 
 		// Provider-specific API keys
-		clineApiKey: config.clineApiKey,
+		clineAccountId: config.clineAccountId,
 		openrouterApiKey: config.openRouterApiKey,
 		anthropicBaseUrl: config.anthropicBaseUrl,
 		openaiApiKey: config.openAiApiKey,
@@ -30,6 +30,7 @@ export function convertApiConfigurationToProtoApiConfiguration(config: ApiConfig
 		qwenApiKey: config.qwenApiKey,
 		doubaoApiKey: config.doubaoApiKey,
 		mistralApiKey: config.mistralApiKey,
+		moonshotApiKey: config.moonshotApiKey,
 		nebiusApiKey: config.nebiusApiKey,
 		asksageApiKey: config.asksageApiKey,
 		xaiApiKey: config.xaiApiKey,
@@ -60,7 +61,9 @@ export function convertApiConfigurationToProtoApiConfiguration(config: ApiConfig
 		awsUseCrossRegionInference: config.awsUseCrossRegionInference,
 		awsBedrockUsePromptCache: config.awsBedrockUsePromptCache,
 		awsUseProfile: config.awsUseProfile,
+		awsAuthentication: config.awsAuthentication,
 		awsProfile: config.awsProfile,
+		awsBedrockApiKey: config.awsBedrockApiKey,
 		awsBedrockEndpoint: config.awsBedrockEndpoint,
 
 		// Vertex AI fields
@@ -137,7 +140,7 @@ export function convertProtoApiConfigurationToApiConfiguration(protoConfig: Prot
 		apiKey: protoConfig.apiKey,
 
 		// Provider-specific API keys
-		clineApiKey: protoConfig.clineApiKey,
+		clineAccountId: protoConfig.clineAccountId,
 		openRouterApiKey: protoConfig.openrouterApiKey,
 		anthropicBaseUrl: protoConfig.anthropicBaseUrl,
 		openAiApiKey: protoConfig.openaiApiKey,
@@ -150,6 +153,7 @@ export function convertProtoApiConfigurationToApiConfiguration(protoConfig: Prot
 		qwenApiKey: protoConfig.qwenApiKey,
 		doubaoApiKey: protoConfig.doubaoApiKey,
 		mistralApiKey: protoConfig.mistralApiKey,
+		moonshotApiKey: protoConfig.moonshotApiKey,
 		nebiusApiKey: protoConfig.nebiusApiKey,
 		asksageApiKey: protoConfig.asksageApiKey,
 		xaiApiKey: protoConfig.xaiApiKey,
@@ -177,6 +181,8 @@ export function convertProtoApiConfigurationToApiConfiguration(protoConfig: Prot
 		awsBedrockUsePromptCache: protoConfig.awsBedrockUsePromptCache,
 		awsUseProfile: protoConfig.awsUseProfile,
 		awsProfile: protoConfig.awsProfile,
+		awsAuthentication: protoConfig.awsAuthentication,
+		awsBedrockApiKey: protoConfig.awsBedrockApiKey,
 		awsBedrockEndpoint: protoConfig.awsBedrockEndpoint,
 
 		// Vertex AI fields

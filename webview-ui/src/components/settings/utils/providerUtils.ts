@@ -34,6 +34,8 @@ import {
 	doubaoModels,
 	doubaoDefaultModelId,
 	liteLlmModelInfoSaneDefaults,
+	moonshotModels,
+	moonshotDefaultModelId,
 	nebiusModels,
 	nebiusDefaultModelId,
 	cerebrasModels,
@@ -129,12 +131,7 @@ export function normalizeApiConfiguration(apiConfiguration?: ApiConfiguration): 
 			return {
 				selectedProvider: provider,
 				selectedModelId: openRouterModelId,
-				// TODO: remove this once we have a better way to handle free models on Cline
-				// Free grok 3 promotion
-				selectedModelInfo:
-					openRouterModelId === "x-ai/grok-3"
-						? { ...openRouterModelInfo, inputPrice: 0, outputPrice: 0 }
-						: openRouterModelInfo,
+				selectedModelInfo: openRouterModelInfo,
 			}
 		case "openai":
 			return {
@@ -173,6 +170,8 @@ export function normalizeApiConfiguration(apiConfiguration?: ApiConfiguration): 
 			}
 		case "xai":
 			return getProviderData(xaiModels, xaiDefaultModelId)
+		case "moonshot":
+			return getProviderData(moonshotModels, moonshotDefaultModelId)
 		case "nebius":
 			return getProviderData(nebiusModels, nebiusDefaultModelId)
 		case "sambanova":

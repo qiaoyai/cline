@@ -11,6 +11,7 @@ import { StoredChatSettings } from "@shared/ChatSettings"
 import { TelemetrySetting } from "@shared/TelemetrySetting"
 import { UserInfo } from "@shared/UserInfo"
 import { ClineRulesToggles } from "@shared/cline-rules"
+import { DEFAULT_MCP_DISPLAY_MODE, McpDisplayMode } from "@shared/McpDisplayMode"
 import { migrateEnableCheckpointsSetting, migrateMcpMarketplaceEnableSetting } from "./state-migrations"
 /*
 	Storage
@@ -18,30 +19,66 @@ import { migrateEnableCheckpointsSetting, migrateMcpMarketplaceEnableSetting } f
 	https://www.eliostruyf.com/devhack-code-extension-storage-options/
 	*/
 
-// global
+const isTemporaryProfile = process.env.TEMP_PROFILE === "true"
 
+// In-memory storage for temporary profiles
+const inMemoryGlobalState = new Map<string, any>()
+const inMemoryWorkspaceState = new Map<string, any>()
+const inMemorySecrets = new Map<string, string>()
+
+// global
 export async function updateGlobalState(context: vscode.ExtensionContext, key: GlobalStateKey, value: any) {
+	if (isTemporaryProfile) {
+		inMemoryGlobalState.set(key, value)
+		return
+	}
 	await context.globalState.update(key, value)
 }
 
 export async function getGlobalState(context: vscode.ExtensionContext, key: GlobalStateKey) {
+	if (isTemporaryProfile) {
+		return inMemoryGlobalState.get(key)
+	}
 	return await context.globalState.get(key)
 }
 
 // Batched operations for performance optimization
 export async function updateGlobalStateBatch(context: vscode.ExtensionContext, updates: Record<string, any>) {
+	if (isTemporaryProfile) {
+		Object.entries(updates).forEach(([key, value]) => {
+			inMemoryGlobalState.set(key, value)
+		})
+		return
+	}
 	// Use Promise.all to batch the updates
 	await Promise.all(Object.entries(updates).map(([key, value]) => context.globalState.update(key as GlobalStateKey, value)))
 }
 
 export async function updateSecretsBatch(context: vscode.ExtensionContext, updates: Record<string, string | undefined>) {
+	if (isTemporaryProfile) {
+		Object.entries(updates).forEach(([key, value]) => {
+			if (value) {
+				inMemorySecrets.set(key, value)
+			} else {
+				inMemorySecrets.delete(key)
+			}
+		})
+		return
+	}
 	// Use Promise.all to batch the secret updates
 	await Promise.all(Object.entries(updates).map(([key, value]) => storeSecret(context, key as SecretKey, value)))
 }
 
 // secrets
-
 export async function storeSecret(context: vscode.ExtensionContext, key: SecretKey, value?: string) {
+	if (isTemporaryProfile) {
+		if (value) {
+			inMemorySecrets.set(key, value)
+		} else {
+			inMemorySecrets.delete(key)
+		}
+		return
+	}
 	if (value) {
 		await context.secrets.store(key, value)
 	} else {
@@ -50,16 +87,25 @@ export async function storeSecret(context: vscode.ExtensionContext, key: SecretK
 }
 
 export async function getSecret(context: vscode.ExtensionContext, key: SecretKey) {
+	if (isTemporaryProfile) {
+		return inMemorySecrets.get(key)
+	}
 	return await context.secrets.get(key)
 }
 
 // workspace
-
 export async function updateWorkspaceState(context: vscode.ExtensionContext, key: LocalStateKey, value: any) {
+	if (isTemporaryProfile) {
+		inMemoryWorkspaceState.set(key, value)
+		return
+	}
 	await context.workspaceState.update(key, value)
 }
 
 export async function getWorkspaceState(context: vscode.ExtensionContext, key: LocalStateKey) {
+	if (isTemporaryProfile) {
+		return inMemoryWorkspaceState.get(key)
+	}
 	return await context.workspaceState.get(key)
 }
 
@@ -70,7 +116,7 @@ export async function getAllExtensionState(context: vscode.ExtensionContext) {
 		welcomeViewCompleted,
 		apiKey,
 		openRouterApiKey,
-		clineApiKey,
+		clineAccountId,
 		awsAccessKey,
 		awsSecretKey,
 		awsSessionToken,
@@ -79,7 +125,9 @@ export async function getAllExtensionState(context: vscode.ExtensionContext) {
 		awsBedrockUsePromptCache,
 		awsBedrockEndpoint,
 		awsProfile,
+		awsBedrockApiKey,
 		awsUseProfile,
+		awsAuthentication,
 		vertexProjectId,
 		vertexRegion,
 		openAiBaseUrl,
@@ -118,6 +166,7 @@ export async function getAllExtensionState(context: vscode.ExtensionContext) {
 		xaiApiKey,
 		sambanovaApiKey,
 		cerebrasApiKey,
+		moonshotApiKey,
 		nebiusApiKey,
 		planActSeparateModelsSettingRaw,
 		favoritedModelIds,
@@ -126,7 +175,7 @@ export async function getAllExtensionState(context: vscode.ExtensionContext) {
 		shellIntegrationTimeout,
 		enableCheckpointsSettingRaw,
 		mcpMarketplaceEnabledRaw,
-		mcpRichDisplayEnabled,
+		mcpDisplayMode,
 		mcpResponsesCollapsedRaw,
 		globalWorkflowToggles,
 		terminalReuseEnabled,
@@ -143,7 +192,7 @@ export async function getAllExtensionState(context: vscode.ExtensionContext) {
 		getGlobalState(context, "welcomeViewCompleted") as Promise<boolean | undefined>,
 		getSecret(context, "apiKey") as Promise<string | undefined>,
 		getSecret(context, "openRouterApiKey") as Promise<string | undefined>,
-		getSecret(context, "clineApiKey") as Promise<string | undefined>,
+		getSecret(context, "clineAccountId") as Promise<string | undefined>,
 		getSecret(context, "awsAccessKey") as Promise<string | undefined>,
 		getSecret(context, "awsSecretKey") as Promise<string | undefined>,
 		getSecret(context, "awsSessionToken") as Promise<string | undefined>,
@@ -152,7 +201,9 @@ export async function getAllExtensionState(context: vscode.ExtensionContext) {
 		getGlobalState(context, "awsBedrockUsePromptCache") as Promise<boolean | undefined>,
 		getGlobalState(context, "awsBedrockEndpoint") as Promise<string | undefined>,
 		getGlobalState(context, "awsProfile") as Promise<string | undefined>,
+		getSecret(context, "awsBedrockApiKey") as Promise<string | undefined>,
 		getGlobalState(context, "awsUseProfile") as Promise<boolean | undefined>,
+		getGlobalState(context, "awsAuthentication") as Promise<string | undefined>,
 		getGlobalState(context, "vertexProjectId") as Promise<string | undefined>,
 		getGlobalState(context, "vertexRegion") as Promise<string | undefined>,
 		getGlobalState(context, "openAiBaseUrl") as Promise<string | undefined>,
@@ -191,6 +242,7 @@ export async function getAllExtensionState(context: vscode.ExtensionContext) {
 		getSecret(context, "xaiApiKey") as Promise<string | undefined>,
 		getSecret(context, "sambanovaApiKey") as Promise<string | undefined>,
 		getSecret(context, "cerebrasApiKey") as Promise<string | undefined>,
+		getSecret(context, "moonshotApiKey") as Promise<string | undefined>,
 		getSecret(context, "nebiusApiKey") as Promise<string | undefined>,
 		getGlobalState(context, "planActSeparateModelsSetting") as Promise<boolean | undefined>,
 		getGlobalState(context, "favoritedModelIds") as Promise<string[] | undefined>,
@@ -199,7 +251,7 @@ export async function getAllExtensionState(context: vscode.ExtensionContext) {
 		getGlobalState(context, "shellIntegrationTimeout") as Promise<number | undefined>,
 		getGlobalState(context, "enableCheckpointsSetting") as Promise<boolean | undefined>,
 		getGlobalState(context, "mcpMarketplaceEnabled") as Promise<boolean | undefined>,
-		getGlobalState(context, "mcpRichDisplayEnabled") as Promise<boolean | undefined>,
+		getGlobalState(context, "mcpDisplayMode") as Promise<McpDisplayMode | undefined>,
 		getGlobalState(context, "mcpResponsesCollapsed") as Promise<boolean | undefined>,
 		getGlobalState(context, "globalWorkflowToggles") as Promise<ClineRulesToggles | undefined>,
 		getGlobalState(context, "terminalReuseEnabled") as Promise<boolean | undefined>,
@@ -325,7 +377,7 @@ export async function getAllExtensionState(context: vscode.ExtensionContext) {
 			apiModelId,
 			apiKey,
 			openRouterApiKey,
-			clineApiKey,
+			clineAccountId,
 			claudeCodePath,
 			awsAccessKey,
 			awsSecretKey,
@@ -335,7 +387,9 @@ export async function getAllExtensionState(context: vscode.ExtensionContext) {
 			awsBedrockUsePromptCache,
 			awsBedrockEndpoint,
 			awsProfile,
+			awsBedrockApiKey,
 			awsUseProfile,
+			awsAuthentication,
 			awsBedrockCustomSelected,
 			awsBedrockCustomModelBaseId,
 			vertexProjectId,
@@ -385,6 +439,7 @@ export async function getAllExtensionState(context: vscode.ExtensionContext) {
 			xaiApiKey,
 			sambanovaApiKey,
 			cerebrasApiKey,
+			moonshotApiKey,
 			nebiusApiKey,
 			favoritedModelIds,
 			requestTimeoutMs,
@@ -419,7 +474,7 @@ export async function getAllExtensionState(context: vscode.ExtensionContext) {
 		previousModeAwsBedrockCustomModelBaseId,
 		previousModeSapAiCoreModelId,
 		mcpMarketplaceEnabled: mcpMarketplaceEnabled,
-		mcpRichDisplayEnabled: mcpRichDisplayEnabled ?? true,
+		mcpDisplayMode: mcpDisplayMode ?? DEFAULT_MCP_DISPLAY_MODE,
 		mcpResponsesCollapsed: mcpResponsesCollapsed,
 		telemetrySetting: telemetrySetting || "unset",
 		planActSeparateModelsSetting,
@@ -445,8 +500,10 @@ export async function updateApiConfiguration(context: vscode.ExtensionContext, a
 		awsUseCrossRegionInference,
 		awsBedrockUsePromptCache,
 		awsBedrockEndpoint,
+		awsBedrockApiKey,
 		awsProfile,
 		awsUseProfile,
+		awsAuthentication,
 		awsBedrockCustomSelected,
 		awsBedrockCustomModelBaseId,
 		vertexProjectId,
@@ -490,9 +547,10 @@ export async function updateApiConfiguration(context: vscode.ExtensionContext, a
 		xaiApiKey,
 		thinkingBudgetTokens,
 		reasoningEffort,
-		clineApiKey,
+		clineAccountId,
 		sambanovaApiKey,
 		cerebrasApiKey,
+		moonshotApiKey,
 		nebiusApiKey,
 		favoritedModelIds,
 		fireworksApiKey,
@@ -539,6 +597,7 @@ export async function updateApiConfiguration(context: vscode.ExtensionContext, a
 		awsBedrockEndpoint,
 		awsProfile,
 		awsUseProfile,
+		awsAuthentication,
 		vertexProjectId,
 		vertexRegion,
 		openAiBaseUrl,
@@ -568,10 +627,11 @@ export async function updateApiConfiguration(context: vscode.ExtensionContext, a
 	const batchedSecretUpdates = {
 		apiKey,
 		openRouterApiKey,
-		clineApiKey,
+		clineAccountId,
 		awsAccessKey,
 		awsSecretKey,
 		awsSessionToken,
+		awsBedrockApiKey,
 		openAiApiKey,
 		geminiApiKey,
 		openAiNativeApiKey,
@@ -587,6 +647,7 @@ export async function updateApiConfiguration(context: vscode.ExtensionContext, a
 		xaiApiKey,
 		sambanovaApiKey,
 		cerebrasApiKey,
+		moonshotApiKey,
 		nebiusApiKey,
 		sapAiCoreClientId,
 		sapAiCoreClientSecret,
@@ -613,6 +674,7 @@ export async function resetGlobalState(context: vscode.ExtensionContext) {
 		"awsAccessKey",
 		"awsSecretKey",
 		"awsSessionToken",
+		"awsBedrockApiKey",
 		"openAiApiKey",
 		"geminiApiKey",
 		"openAiNativeApiKey",
@@ -622,13 +684,14 @@ export async function resetGlobalState(context: vscode.ExtensionContext) {
 		"qwenApiKey",
 		"doubaoApiKey",
 		"mistralApiKey",
-		"clineApiKey",
+		"clineAccountId",
 		"liteLlmApiKey",
 		"fireworksApiKey",
 		"asksageApiKey",
 		"xaiApiKey",
 		"sambanovaApiKey",
 		"cerebrasApiKey",
+		"moonshotApiKey",
 		"nebiusApiKey",
 	]
 	for (const key of secretKeys) {

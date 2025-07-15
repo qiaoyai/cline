@@ -54,9 +54,9 @@ const featuredModels = [
 		label: "Trending",
 	},
 	{
-		id: "x-ai/grok-3",
-		description: "Latest flagship model from xAI, free for now!",
-		label: "Free",
+		id: "moonshotai/kimi-k2",
+		description: "Open source model topping coding benchmarks",
+		label: "New",
 	},
 ]
 
